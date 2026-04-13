@@ -638,10 +638,57 @@ body {
 .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
 hr.thin { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+/* HAMBURGER */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 12px; left: 12px;
+  z-index: 400;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 5px;
+}
+.hamburger span { display: block; width: 20px; height: 2px; background: var(--text); border-radius: 2px; }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 300; }
+.sidebar-overlay.active { display: block; }
+
+@media (max-width: 768px) {
+  .hamburger { display: flex; }
+  .shell { grid-template-columns: 1fr; }
+  .sidebar {
+    position: fixed;
+    left: -290px; top: 0;
+    width: 280px; height: 100vh;
+    z-index: 350;
+    transition: left .25s ease;
+    box-shadow: 4px 0 24px rgba(0,0,0,.5);
+  }
+  .sidebar.open { left: 0; }
+  .main { padding: 60px 18px 40px; max-width: 100%; }
+  .topbar { padding: 12px 16px 12px 52px; margin: -60px -18px 24px; }
+  .topbar-sep { display: none; }
+  .topbar-section:not(:last-of-type) { display: none; }
+  .phase-title { font-size: 22px; }
+  .card { padding: 14px 16px; }
+  .script-line { flex-direction: column; gap: 3px; }
+  .script-line .speaker { min-width: unset; }
+  .progress-strip { left: 0; }
+  #timelineBar { left: 0; padding: 10px 16px; }
+  .q-block .q-text h3 { font-size: 14px; }
+  .q-block .q-header { padding: 12px 14px; }
+}
 </style>
 </head>
 <body>
-
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+  <span></span><span></span><span></span>
+</button>
 <div class="progress-strip"><div class="progress-fill" id="progressFill"></div></div>
 
 <div class="shell">
@@ -1866,6 +1913,16 @@ hr.thin { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 </div>
 
 <script>
+// Sidebar mobile toggle
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('active');
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('active');
+}
+
 // Page navigation
 const pages = ['pre','briefing','s1','s2','s3','s4','s5','s6','closing','end','phrases','positions','about'];
 
@@ -1882,6 +1939,7 @@ function goTo(id, el) {
   document.getElementById('mainContent').scrollTop = 0;
   window.scrollTo(0,0);
   updateProgress(id);
+  closeSidebar();
 }
 
 function updateProgress(id) {
